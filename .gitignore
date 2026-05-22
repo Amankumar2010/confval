@@ -1,0 +1,13 @@
+# Binaries
+/confval
+/bin/
+*.exe
+
+# Test artifacts
+*.out
+coverage.*
+
+# Editor / OS
+.DS_Store
+.idea/
+.vscode/

@@ -1,0 +1,5 @@
+service:
+  name: web-api
+  port: 8080
+  environment: production
+  replicas: 3

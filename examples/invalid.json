@@ -1,0 +1,7 @@
+{
+  "service": {
+    "name": "Web_API",
+    "port": 99999,
+    "environment": "prod"
+  }
+}
