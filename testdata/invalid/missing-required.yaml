@@ -1,0 +1,3 @@
+service:
+  name: api
+  # port and environment are missing

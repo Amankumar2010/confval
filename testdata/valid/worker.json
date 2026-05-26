@@ -1,0 +1,7 @@
+{
+  "service": {
+    "name": "billing-worker",
+    "port": 9090,
+    "environment": "staging"
+  }
+}

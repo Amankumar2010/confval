@@ -20,6 +20,7 @@ package main
 import (
 	"flag"
 	"fmt"
+	"io"
 	"os"
 
 	"github.com/Amankumar2010/confval"
@@ -48,18 +49,29 @@ func ruleSet() *confval.Validator {
 }
 
 func main() {
-	quiet := flag.Bool("quiet", false, "print only failures, not per-file ok lines")
-	flag.Usage = func() {
-		fmt.Fprintf(os.Stderr, "usage: confval [-quiet] <file> [file...]\n\n")
-		fmt.Fprintf(os.Stderr, "Validates YAML/JSON config files. Exit 0=all valid, 1=invalid, 2=usage error.\n")
-		flag.PrintDefaults()
-	}
-	flag.Parse()
+	os.Exit(run(os.Args[1:], os.Stdout, os.Stderr))
+}
 
-	files := flag.Args()
+// run is the testable core of the CLI: it parses args, validates each file, and
+// returns the process exit code (0 valid, 1 invalid, 2 usage/load error) while
+// writing all output to the provided streams instead of the globals.
+func run(args []string, stdout, stderr io.Writer) int {
+	fs := flag.NewFlagSet("confval", flag.ContinueOnError)
+	fs.SetOutput(stderr)
+	quiet := fs.Bool("quiet", false, "print only failures, not per-file ok lines")
+	fs.Usage = func() {
+		fmt.Fprintf(stderr, "usage: confval [-quiet] <file> [file...]\n\n")
+		fmt.Fprintf(stderr, "Validates YAML/JSON config files. Exit 0=all valid, 1=invalid, 2=usage error.\n")
+		fs.PrintDefaults()
+	}
+	if err := fs.Parse(args); err != nil {
+		return 2
+	}
+
+	files := fs.Args()
 	if len(files) == 0 {
-		flag.Usage()
-		os.Exit(2)
+		fs.Usage()
+		return 2
 	}
 
 	v := ruleSet()
@@ -67,25 +79,26 @@ func main() {
 	for _, path := range files {
 		c, err := config.Load(path)
 		if err != nil {
-			fmt.Fprintf(os.Stderr, "%s: load error: %v\n", path, err)
-			os.Exit(2)
+			fmt.Fprintf(stderr, "%s: load error: %v\n", path, err)
+			return 2
 		}
 		report := v.Validate(c)
 		if !report.OK() {
 			failed = true
 		}
-		printReport(path, report, *quiet)
+		printReport(stdout, path, report, *quiet)
 	}
 
 	if failed {
-		os.Exit(1)
+		return 1
 	}
+	return 0
 }
 
-func printReport(path string, r *confval.Report, quiet bool) {
+func printReport(w io.Writer, path string, r *confval.Report, quiet bool) {
 	if r.OK() && len(r.Warnings()) == 0 {
 		if !quiet {
-			fmt.Printf("%s: ok\n", path)
+			fmt.Fprintf(w, "%s: ok\n", path)
 		}
 		return
 	}
@@ -93,8 +106,8 @@ func printReport(path string, r *confval.Report, quiet bool) {
 	if !r.OK() {
 		status = "FAILED"
 	}
-	fmt.Printf("%s: %s\n", path, status)
+	fmt.Fprintf(w, "%s: %s\n", path, status)
 	for _, viol := range r.Violations {
-		fmt.Printf("  %s\n", viol)
+		fmt.Fprintf(w, "  %s\n", viol)
 	}
 }
