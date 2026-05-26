@@ -1,5 +1,10 @@
 # confval
 
+[![CI](https://github.com/Amankumar2010/confval/actions/workflows/ci.yml/badge.svg)](https://github.com/Amankumar2010/confval/actions/workflows/ci.yml)
+[![Go Reference](https://pkg.go.dev/badge/github.com/Amankumar2010/confval.svg)](https://pkg.go.dev/github.com/Amankumar2010/confval)
+[![Go Report Card](https://goreportcard.com/badge/github.com/Amankumar2010/confval)](https://goreportcard.com/report/github.com/Amankumar2010/confval)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
+
 Validate YAML and JSON configuration files against **custom business rules
 written in Go** before they reach production. Use it as a library inside your
 deploy pipeline, or as a CLI gate in CI.
@@ -11,6 +16,10 @@ deploy pipeline, or as a CLI gate in CI.
 - **Rules are just Go** — composable built-ins for the common cases, and a
   plain `func` escape hatch for anything bespoke.
 - **Warnings vs. errors** — flag advisories that don't block a deploy.
+
+<p align="center">
+  <img src="docs/demo.svg" alt="confval CLI validating a passing and a failing config" width="520">
+</p>
 
 ## Install
 

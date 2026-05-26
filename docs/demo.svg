@@ -1,0 +1,38 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1000" height="1000" font-family="SFMono-Regular, Menlo, Consolas, monospace" font-size="15">
+  <!-- desktop backdrop -->
+  <rect width="1000" height="1000" fill="#181825"/>
+
+  <!-- title / tagline -->
+  <text x="500" y="150" fill="#cdd6f4" font-size="34" font-weight="bold" text-anchor="middle">confval</text>
+  <text x="500" y="190" fill="#9399b2" font-size="17" text-anchor="middle">validate YAML / JSON config before it ships</text>
+
+  <!-- terminal window -->
+  <rect x="40" y="250" width="920" height="500" rx="12" fill="#1e1e2e"/>
+  <rect x="40" y="250" width="920" height="40" rx="12" fill="#313244"/>
+  <rect x="40" y="278" width="920" height="12" fill="#313244"/>
+  <circle cx="66" cy="270" r="7" fill="#f38ba8"/>
+  <circle cx="90" cy="270" r="7" fill="#f9e2af"/>
+  <circle cx="114" cy="270" r="7" fill="#a6e3a1"/>
+  <text x="500" y="275" fill="#9399b2" font-size="14" text-anchor="middle">confval — zsh</text>
+
+  <!-- terminal body -->
+  <text x="64" y="330" fill="#cdd6f4"><tspan fill="#a6e3a1">$ </tspan><tspan fill="#89b4fa">confval</tspan> examples/valid.yaml examples/invalid.json</text>
+
+  <text x="64" y="362" fill="#cdd6f4">examples/valid.yaml: <tspan fill="#a6e3a1" font-weight="bold">ok</tspan></text>
+
+  <text x="64" y="394" fill="#cdd6f4">examples/invalid.json: <tspan fill="#f38ba8" font-weight="bold">FAILED</tspan></text>
+  <text x="88" y="424" fill="#f38ba8" font-size="14">error<tspan fill="#cdd6f4">: service.environment: must be one of [...], got "prod"</tspan></text>
+  <text x="88" y="450" fill="#f38ba8" font-size="14">error<tspan fill="#cdd6f4">: service.name: must match "^[a-z][a-z0-9-]*$", got "Web_API"</tspan></text>
+  <text x="88" y="476" fill="#f38ba8" font-size="14">error<tspan fill="#cdd6f4">: service.port: must be in [1, 65535], got 99999</tspan></text>
+
+  <text x="64" y="516" fill="#cdd6f4"><tspan fill="#a6e3a1">$ </tspan><tspan fill="#89b4fa">echo</tspan> $?</text>
+  <text x="64" y="544" fill="#f9e2af">1</text>
+  <text x="64" y="576" fill="#cdd6f4"><tspan fill="#a6e3a1">$ </tspan><tspan fill="#6c7086">▋</tspan></text>
+
+  <!-- one-pass note -->
+  <text x="500" y="690" fill="#a6e3a1" font-size="16" text-anchor="middle">every violation in one pass · errors pinned to the field path</text>
+
+  <!-- footer -->
+  <text x="500" y="830" fill="#cdd6f4" font-size="18" text-anchor="middle">written in Go · library + CLI · MIT</text>
+  <text x="500" y="864" fill="#89b4fa" font-size="16" text-anchor="middle">github.com/Amankumar2010/confval</text>
+</svg>
