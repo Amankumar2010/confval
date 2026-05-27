@@ -21,6 +21,21 @@ deploy pipeline, or as a CLI gate in CI.
   <img src="docs/demo.svg" alt="confval CLI validating a passing and a failing config" width="520">
 </p>
 
+## Why
+
+Most config bugs aren't subtle — a port out of range, an environment typo'd as
+`prod` instead of `production`, a required field someone forgot. They're cheap
+to catch and expensive to discover in production. JSON Schema covers shape, but
+real policies are often cross-field business rules ("production needs ≥2
+replicas") that are awkward to express declaratively and natural to write in
+Go.
+
+`confval` is that: a tiny engine where a rule is just a Go function, every run
+reports *all* problems at once (not fail-fast), and the same binary drops into
+CI as a deploy gate. I built it to learn idiomatic Go library design — a small
+public API, a thin CLI over a reusable core, and tests as a first-class
+concern.
+
 ## Install
 
 ```sh
@@ -120,9 +135,15 @@ index into lists: `servers.0.port` reads `servers[0].port`.
 ## Development
 
 ```sh
-go test ./...
+go test -race ./...
 go vet ./...
+gofmt -l .
 ```
+
+## Contributing
+
+Contributions are welcome — see [CONTRIBUTING.md](CONTRIBUTING.md). The easiest
+start is adding a config fixture under `testdata/valid` or `testdata/invalid`.
 
 ## License
 
