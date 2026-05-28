@@ -132,6 +132,99 @@ quiet until you pair them with `Required`.
 Rules address values by dotted path. Map keys are segments; numeric segments
 index into lists: `servers.0.port` reads `servers[0].port`.
 
+## Using it in CI/CD
+
+The CLI's exit codes make it drop-in for any CI system: `0` valid, `1` invalid,
+`2` usage/load error. Three ways to wire it in, in order of how much customization
+your configs need.
+
+### 1. The reusable GitHub Action (one-liner)
+
+For projects whose rules are defined in a small Go file:
+
+```yaml
+# .github/workflows/validate-config.yml
+on: [pull_request, push]
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: Amankumar2010/confval-action@v1
+        with:
+          files: 'config/*.yaml'
+          validator: ./cmd/validate-config   # your rules; optional
+```
+
+### 2. A tiny in-repo validator binary (recommended)
+
+Drop a ~15-line `main.go` into the repo that owns your configs, defining your
+real rules with the `confval` library:
+
+```go
+// cmd/validate-config/main.go
+package main
+
+import (
+	"fmt"
+	"os"
+
+	"github.com/Amankumar2010/confval"
+	"github.com/Amankumar2010/confval/config"
+)
+
+func main() {
+	v := confval.NewValidator(
+		confval.Required("app.name", "app.port", "app.env"),
+		confval.InRange("app.port", 1, 65535),
+		confval.OneOf("app.env", "dev", "staging", "production"),
+		// ...your rules
+	)
+	failed := false
+	for _, path := range os.Args[1:] {
+		c, err := config.Load(path)
+		if err != nil {
+			fmt.Fprintln(os.Stderr, err); os.Exit(2)
+		}
+		r := v.Validate(c)
+		fmt.Printf("%s: %s\n", path, r)
+		if !r.OK() {
+			failed = true
+		}
+	}
+	if failed {
+		os.Exit(1)
+	}
+}
+```
+
+Then in CI:
+
+```yaml
+- uses: actions/setup-go@v5
+  with: { go-version: '1.24' }
+- run: go run ./cmd/validate-config config/*.yaml
+```
+
+Pair the job with a **branch protection rule** requiring it to pass before
+merging into `main` and bad config physically can't reach production.
+
+### 3. Pre-deploy gate
+
+Same step, run immediately before `deploy`:
+
+```yaml
+- name: Gate on config validity
+  run: go run ./cmd/validate-config config/${{ inputs.environment }}.yaml
+- name: Deploy
+  if: success()
+  run: ./deploy.sh
+```
+
+The bundled `cmd/confval` binary also runs directly via `go run` if its default
+`service.*` rule set happens to match your schema — but most users will want
+their own rules.
+
 ## Development
 
 ```sh
